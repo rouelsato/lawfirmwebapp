@@ -77,6 +77,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Elnar Lape Lastimoso & Associates" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "Cebu Lawyers & Attorneys | Elnar Lape Lastimoso & Associates" },
+      { name: "twitter:title", content: "Cebu Lawyers & Attorneys | Elnar Lape Lastimoso & Associates" },
+      { property: "og:description", content: "Trusted Cebu law firm — corporate, PEZA, family & litigation counsel. Transparent fees, clear process, inclusive practice." },
+      { name: "twitter:description", content: "Trusted Cebu law firm — corporate, PEZA, family & litigation counsel. Transparent fees, clear process, inclusive practice." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/63fa9e50-877d-4170-be03-cc8c336e099d/id-preview-bd611119--962ac56c-ac1c-4934-a409-91f5ab6c671a.lovable.app-1779948969970.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/63fa9e50-877d-4170-be03-cc8c336e099d/id-preview-bd611119--962ac56c-ac1c-4934-a409-91f5ab6c671a.lovable.app-1779948969970.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
