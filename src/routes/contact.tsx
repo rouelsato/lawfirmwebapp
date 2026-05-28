@@ -138,7 +138,7 @@ function ContactPage() {
             <ul className="mt-5 space-y-4 text-sm">
               <li className="flex gap-3"><MapPin size={18} className="mt-0.5 shrink-0 text-gold" /> Cebu Business Park, Cebu City, Philippines</li>
               <li className="flex gap-3"><Phone size={18} className="mt-0.5 shrink-0 text-gold" /> +63 905 405 2952</li>
-              <li className="flex gap-3"><Mail size={18} className="mt-0.5 shrink-0 text-gold" /> hello@lawfirmcebu.com</li>
+              <li className="flex gap-3"><Mail size={18} className="mt-0.5 shrink-0 text-gold" /> rouel.sato94@gmail.com</li>
               <li className="flex gap-3"><Clock size={18} className="mt-0.5 shrink-0 text-gold" /> Mon – Fri · 8:30 AM – 5:30 PM (PHT)</li>
             </ul>
           </div>
