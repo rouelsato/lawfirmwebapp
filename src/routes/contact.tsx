@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { MapPin, Mail, Phone, Clock, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { MapPin, Mail, Phone, Clock, ShieldCheck, CheckCircle2, Loader2 } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
+import { sendContactEmail } from "@/lib/api/contact.functions";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -30,6 +31,9 @@ const matters = [
 
 function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   return (
     <SiteShell>
@@ -62,10 +66,39 @@ function ContactPage() {
               </div>
             ) : (
               <form
+                ref={formRef}
                 className="space-y-5"
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  setSubmitted(true);
+                  setError(null);
+                  setIsLoading(true);
+
+                  try {
+                    const formData = new FormData(formRef.current!);
+                    
+                    // Send email via server function
+                    const result = await sendContactEmail({
+                      data: {
+                        name: formData.get("name") as string,
+                        email: formData.get("email") as string,
+                        phone: (formData.get("phone") as string) || undefined,
+                        matter: formData.get("matter") as string,
+                        message: formData.get("message") as string,
+                        website: formData.get("website") as string,
+                      },
+                    });
+
+                    if (result.success) {
+                      setSubmitted(true);
+                    } else {
+                      setError("Failed to send message. Please try again.");
+                    }
+                  } catch (err) {
+                    console.error("Error sending message:", err);
+                    setError("Failed to send message. Please try again.");
+                  } finally {
+                    setIsLoading(false);
+                  }
                 }}
               >
                 <h2 className="font-serif text-2xl text-primary">Tell us about your matter</h2>
@@ -97,6 +130,12 @@ function ContactPage() {
                 {/* Honeypot */}
                 <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" />
 
+                {error && (
+                  <div className="rounded-sm bg-red-50 border border-red-200 p-4 text-sm text-red-700">
+                    {error}
+                  </div>
+                )}
+
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <ShieldCheck size={14} className="text-sage" />
                   Anything you share is confidential.
@@ -104,9 +143,11 @@ function ContactPage() {
 
                 <button
                   type="submit"
-                  className="w-full rounded-sm bg-primary px-6 py-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                  disabled={isLoading}
+                  className="w-full rounded-sm bg-primary px-6 py-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Send message
+                  {isLoading && <Loader2 size={16} className="animate-spin" />}
+                  {isLoading ? "Sending..." : "Send message"}
                 </button>
               </form>
             )}
