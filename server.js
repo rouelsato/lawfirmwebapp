@@ -7,55 +7,49 @@ const PORT = process.env.PORT || 3000;
 const distPath = path.join(__dirname, 'dist', 'client');
 const indexPath = path.join(distPath, 'index.html');
 
-console.log(`✓ Server starting...`);
-console.log(`✓ Serving files from: ${distPath}`);
+console.log(`✓ Server starting on port ${PORT}`);
+console.log(`✓ Serving from: ${distPath}`);
 
-// Verify dist/client exists
 if (!fs.existsSync(indexPath)) {
-  console.error(`✗ CRITICAL: ${indexPath} not found!`);
+  console.error(`✗ ERROR: index.html not found at ${indexPath}`);
   process.exit(1);
 }
 
-// Serve only assets with long cache
-app.use('/assets', express.static(path.join(distPath, 'assets'), { 
-  maxAge: '1y',
-  etag: false 
-}));
-
-// Serve static files in root (robots.txt, favicon.ico, etc)
-app.use(express.static(distPath, {
-  maxAge: '1d',
-  setHeaders: (res, filepath) => {
-    if (filepath.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    }
-  }
-}));
-
-// Health check
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
-});
-
-// Fallback: redirect all unknown routes to home
-app.use((req, res) => {
-  // Don't redirect if it's an API or explicitly missing file
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).send('Not Found');
+// Custom middleware to handle SPA routing
+app.use((req, res, next) => {
+  // For /assets, continue to static serving
+  if (req.path.startsWith('/assets')) {
+    return express.static(distPath)(req, res, next);
   }
   
-  console.log(`→ Redirecting ${req.path} → /`);
-  res.redirect('/');
+  // Check if file exists in dist/client
+  const filePath = path.join(distPath, req.path);
+  
+  try {
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      // File exists, serve it
+      return res.sendFile(filePath);
+    }
+  } catch (e) {
+    // Ignore errors, fall through to index.html
+  }
+  
+  // For all other requests, serve index.html (SPA routing)
+  console.log(`→ SPA: ${req.method} ${req.path} → index.html`);
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(indexPath);
 });
 
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✓ Server listening on http://0.0.0.0:${PORT}`);
+// Static files middleware
+app.use(express.static(distPath, { 
+  maxAge: '1y',
+  etag: false
+}));
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✓ Server ready`);
 });
 
-process.on('SIGTERM', () => {
-  console.log('Shutdown signal received');
-  server.close(() => process.exit(0));
-});
 
 
 
