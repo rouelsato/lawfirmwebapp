@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: cebulawfirm
+    runtime: node
+    buildCommand: bun install && bun run build
+    startCommand: bunx vite preview --host 0.0.0.0 --port 3000
+    staticPublishPath: dist/client
+    envVars:
+      - key: NODE_ENV
+        value: production
