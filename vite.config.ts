@@ -7,5 +7,5 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
-  // TanStack Start static/SPA mode for Vercel
+  // SPA mode - let TanStack Start handle client build with our HTML entry
 });
