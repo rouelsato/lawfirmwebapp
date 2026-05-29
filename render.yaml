@@ -3,7 +3,7 @@ services:
     name: cebulawfirm
     runtime: node
     buildCommand: bun install && bun run build
-    startCommand: node server.mjs
+    startCommand: node server.js
     envVars:
       - key: NODE_ENV
         value: production
