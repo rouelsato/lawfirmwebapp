@@ -7,8 +7,5 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
-  tanstackStart: {
-    // Static export for Vercel deployment - no server-side rendering needed
-    server: false,
-  },
+  // TanStack Start static/SPA mode for Vercel
 });
