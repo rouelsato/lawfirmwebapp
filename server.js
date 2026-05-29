@@ -17,52 +17,48 @@ if (!fs.existsSync(indexPath)) {
   process.exit(1);
 }
 
-// Serve static files from dist/client with proper cache headers
-app.use(express.static(distPath, { 
+// Serve assets folder
+app.use('/assets', express.static(path.join(distPath, 'assets'), { 
   maxAge: '1y',
-  etag: false,
-  setHeaders: (res, filepath) => {
-    if (filepath.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    }
-  }
+  etag: false 
 }));
 
-// Health check endpoint
+// Serve robots.txt if it exists
+if (fs.existsSync(path.join(distPath, 'robots.txt'))) {
+  app.get('/robots.txt', (req, res) => {
+    res.sendFile(path.join(distPath, 'robots.txt'));
+  });
+}
+
+// Serve favicon if it exists
+if (fs.existsSync(path.join(distPath, 'favicon.ico'))) {
+  app.get('/favicon.ico', (req, res) => {
+    res.sendFile(path.join(distPath, 'favicon.ico'));
+  });
+}
+
+// Health check
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
 
-// SPA fallback - catch all non-static requests and serve index.html
+// SPA fallback - serve index.html for ALL other requests
 app.use((req, res) => {
-  // Don't serve index.html for API routes or known non-HTML requests
-  if (req.path.startsWith('/api/') || req.path.startsWith('/assets/')) {
-    return res.status(404).send('Not Found');
-  }
-  
-  console.log(`→ SPA route requested: ${req.method} ${req.path}`);
-  res.sendFile(indexPath, (err) => {
-    if (err) {
-      console.error(`✗ Error serving ${indexPath}:`, err.message);
-      res.status(500).send('Internal Server Error');
-    }
-  });
+  console.log(`→ SPA route: ${req.method} ${req.path}`);
+  res.set('Cache-Control', 'public, max-age=0, must-revalidate');
+  res.set('Content-Type', 'text/html; charset=utf-8');
+  res.sendFile(indexPath);
 });
 
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`✓ Server listening on http://0.0.0.0:${PORT}`);
-  console.log(`✓ Ready to serve requests`);
 });
 
-// Handle graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully...');
-  server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
-  });
+  console.log('Shutdown signal received');
+  server.close(() => process.exit(0));
 });
+
 
 
 
