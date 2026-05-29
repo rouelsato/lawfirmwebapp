@@ -1,21 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { RouterProvider } from "@tanstack/react-router";
 import { getRouter } from "./router";
 
 const router = getRouter();
 
-const rootElement = document.getElementById("root");
-
-if (!rootElement) {
-  throw new Error("Root element not found");
-}
-
-ReactDOM.createRoot(rootElement).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {router.dehydrate ? (
-      <router.RouterProvider />
-    ) : (
-      <router.RouterProvider />
-    )}
+    <RouterProvider router={router} />
   </React.StrictMode>
 );
